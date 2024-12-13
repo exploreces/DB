@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .input-field {
+            padding: 8px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+<h1>File Upload and Management</h1>
+
+<!-- Upload Form -->
+<form id="uploadForm" enctype="multipart/form-data">
+    <label for="file">Upload File:</label>
+    <input type="file" name="file" id="file" required>
+    <button type="submit" class="btn">Upload</button>
+</form>
+
+<!-- Search Form -->
+<form id="searchForm">
+    <label for="query">Search Files:</label>
+    <input type="text" id="query" name="query" class="input-field" placeholder="Enter keyword..." required>
+    <button type="submit" class="btn">Search</button>
+</form>
+
+<!-- File List -->
+<div class="file-list" id="fileList">
+    <!-- Results will appear here -->
+</div>
+
+<script>
+    // Upload Form Submission
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("file", document.getElementById("file").files[0]);
+
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        const result = await response.json();
+        alert("File uploaded successfully: " + result.fileName);
+    });
+
+    // Search Form Submission
+    document.getElementById("searchForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const query = document.getElementById("query").value;
+
+        const response = await fetch(`/search?query=${query}`);
+        const files = await response.json();
+
+        const fileList = document.getElementById("fileList");
+        fileList.innerHTML = "";
+
+        if (files.length > 0) {
+            files.forEach((file) => {
+                const fileItem = document.createElement("div");
+                fileItem.className = "file-item";
+                fileItem.innerHTML = `
+                    <strong>${file.fileName}</strong> -
+                    <a href="${file.downloadURL}" class="btn">Download</a>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        } else {
+            fileList.innerHTML = "<p>No files found.</p>";
+        }
+    });
+</script>
+</body>
+</html>
