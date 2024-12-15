@@ -1,28 +1,27 @@
 package com.dailycodebuffer.filemngt.entity;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+// id , filename , filetype , data(byte form)
 
 @Entity
-@Data@NoArgsConstructor
+@Data // lombok annotation -> for getters , setters methods
+@NoArgsConstructor
 public class Attachment {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
+        private String fileName;
+        private String fileType;
 
-    private String fileName;
-    private String fileType;
+        @Lob // large object (LOB) in the database.
+        @Column(name = "data", columnDefinition = "LONGBLOB")
+        private byte[] data;
 
-    @Lob
-    private byte[] data;
 
     public Attachment(String fileName, String fileType, byte[] data) {
         this.fileName = fileName;
